@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>GalaXiteMC - Servidor de Minecraft</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: white;
+      margin: 0;
+      padding: 0;
+      display: flex;
+    }
+
+    /* Menú lateral */
+    .sidebar {
+      width: 200px;
+      background-color: #1e1e1e;
+      height: 100vh;
+      position: fixed;
+      padding-top: 20px;
+    }
+
+    .menu-toggle {
+      display: none;
+      background-color: #2a2a2a;
+      border: none;
+      color: white;
+      padding: 10px 15px;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .sidebar-menu li {
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+
+    .sidebar-menu li:hover {
+      background-color: #2a2a2a;
+    }
+
+    /* Contenido principal */
+    .content {
+      margin-left: 200px;
+      flex: 1;
+      padding: 20px;
+    }
+
+    /* Secciones */
+    .section {
+      display: none;
+      margin-bottom: 30px;
+      background-color: #1e1e1e;
+      padding: 20px;
+      border-radius: 5px;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    /* Encabezado */
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .header h1 {
+      color: #8e44ad;
+      font-size: 36px;
+      margin-bottom: 5px;
+    }
+
+    /* Formularios */
+    input, textarea, select {
+      display: block;
+      margin: 10px 0;
+      padding: 8px;
+      width: 100%;
+      background-color: #2a2a2a;
+      border: none;
+      color: white;
+      border-radius: 3px;
+    }
+
+    button {
+      background-color: #8e44ad;
+      color: white;
+      padding: 10px 15px;
+      border: none;
+      cursor: pointer;
+      border-radius: 3px;
+    }
+
+    /* Opiniones */
+    .opinion {
+      background-color: #2a2a2a;
+      padding: 15px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+
+    /* Galería */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .gallery img {
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+    }
+
+    /* Overlay para el registro obligatorio */
+    .registro-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.9);
+      z-index: 1000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .registro-container {
+      background-color: #1e1e1e;
+      padding: 30px;
+      border-radius: 8px;
+      width: 90%;
+      max-width: 500px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+        padding-top: 0;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .sidebar-menu {
+        display: none;
+      }
+
+      .sidebar-menu.show {
+        display: block;
+      }
+
+      .content {
+        margin-left: 0;
+        padding: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<!-- Overlay de registro obligatorio -->
+<div id="registro-overlay" class="registro-overlay">
+  <div class="registro-container">
+    <div class="header">
+      <h1>GalaXiteMC</h1>
+      <p>¡Regístrate para empezar a explorar el universo con nosotros!</p>
+    </div>
+    
+    <h2>Registro obligatorio</h2>
+    <form id="registro-form-overlay" onsubmit="registrarUsuarioOverlay(event)">
+      <label for="nick-overlay">Nick:</label>
+      <input type="text" id="nick-overlay" placeholder="Tu nombre en el juego" required>
+      
+      <label for="password-overlay">Contraseña del servidor:</label>
+      <input type="password" id="password-overlay" placeholder="Tu contraseña" required>
+      
+      <label for="confirm-password-overlay">Confirma la contraseña:</label>
+      <input type="password" id="confirm-password-overlay" placeholder="Repite tu contraseña" required>
+      
+      <label for="age-overlay">Edad:</label>
+      <input type="number" id="age-overlay" placeholder="Tu edad" required>
+      
+      <button type="submit">Registrarme</button>
+      <p id="registro-mensaje-overlay"></p>
+    </form>
+  </div>
+</div>
+
+<!-- Menú lateral -->
+<div class="sidebar">
+  <button class="menu-toggle" onclick="toggleMenu()">≡</button>
+  <ul class="sidebar-menu" id="menu">
+    <li onclick="showSection('inicio')">Inicio</li>
+    <li onclick="showSection('registro')">Registro</li>
+    <li onclick="showSection('youtube')">YouTube</li>
+    <li onclick="showSection('calificacion')">Calificación</li>
+    <li onclick="showSection('multimedia')">Multimedia</li>
+  </ul>
+</div>
+
+<!-- Contenido principal -->
+<div class="content">
+  <div class="header">
+    <h1>GalaXiteMC</h1>
+    <p>Servidor de Minecraft Pocket Edition - ¡Explora el universo con nosotros!</p>
+  </div>
+
+  <!-- Sección de inicio -->
+  <div id="inicio" class="section active">
+    <h2>Gracias por visitarnos</h2>
+    <p>Te invitamos a registrarte con los datos del servidor</p>
+    <div class="server-info">
+      <p><strong>IP:</strong> GalaXiteMC.sytes.net</p>
+      <p><strong>Puerto:</strong> 25635</p>
+      <p><strong>Versión:</strong> 0.15.10</p>
+      <p><strong>Soporte:</strong> <a href="https://discord.gg/JQZub3ZMvc" style="color: #8e44ad;">Discord</a></p>
+    </div>
+  </div>
+
+  <!-- Sección de registro -->
+  <div id="registro" class="section">
+    <h2>Regístrate en el servidor</h2>
+    <form onsubmit="registrarUsuario(event)">
+      <label for="nick">Nick:</label>
+      <input type="text" id="nick" placeholder="Tu nombre en el juego" required>
+      
+      <label for="password">Contraseña del servidor:</label>
+      <input type="password" id="password" placeholder="Tu contraseña" required>
+      
+      <label for="confirm-password">Confirma la contraseña:</label>
+      <input type="password" id="confirm-password" placeholder="Repite tu contraseña" required>
+      
+      <label for="age">Edad:</label>
+      <input type="number" id="age" placeholder="Tu edad" required>
+      
+      <button type="submit">Registrarme</button>
+      <p id="registro-mensaje"></p>
+    </form>
+  </div>
+
+  <!-- Sección de YouTube -->
+  <div id="youtube" class="section">
+    <h2>Canal de YouTube</h2>
+    <a href="https://youtube.com/@eduardo_1000k?si=QBB3kTnmBC_lBYcc" target="_blank">
+      <button>Ir al canal</button>
+    </a>
+    <p>Sube tus videos con el hashtag <strong>#galaxitemcpe</strong> y podrías salir en la web.</p>
+  </div>
+
+  <!-- Sección de calificación -->
+  <div id="calificacion" class="section">
+    <h2>Califica el servidor</h2>
+    <form onsubmit="calificarServidor(event)">
+      <label for="rating">Puntaje (1 al 10):</label>
+      <select id="rating" required>
+        <option value="">Selecciona una calificación</option>
+        <option value="1">1 - Muy malo</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5 - Aceptable</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+        <option value="9">9</option>
+        <option value="10">10 - Excelente</option>
+      </select>
+      
+      <label for="comment">Tu opinión:</label>
+      <textarea id="comment" rows="4" placeholder="Dinos qué te parece el servidor" required></textarea>
+      
+      <button type="submit">Enviar calificación</button>
+      <p id="calificacion-mensaje"></p>
+    </form>
+    
+    <h3>Opiniones recientes</h3>
+    <div id="opiniones-container"></div>
+  </div>
+
+  <!-- Sección multimedia -->
+  <div id="multimedia" class="section">
+    <h2>Galería de imágenes</h2>
+    <div class="gallery">
+      <img src="https://via.placeholder.com/300x200.png?text=GalaXite+1" alt="GalaXite Screenshot">
+      <img src="https://via.placeholder.com/300x200.png?text=GalaXite+2" alt="GalaXite Screenshot">
+      <img src="https://via.placeholder.com/300x200.png?text=GalaXite+3" alt="GalaXite Screenshot">
+      <img src="https://via.placeholder.com/300x200.png?text=GalaXite+4" alt="GalaXite Screenshot">
+      <img src="https://via.placeholder.com/300x200.png?text=GalaXite+5" alt="GalaXite Screenshot">
+      <img src="https://via.placeholder.com/300x200.png?text=GalaXite+6" alt="GalaXite Screenshot">
+    </div>
+    <h3>Imágenes recientes</h3>
+  </div>
+
+  <footer>
+    <p>© 2025 GalaXiteMC | Creado por: @educraft_100k, jeipro, Xxx_BOTi_xxX</p>
+  </footer>
+</div>
+
+<script>
+  // Comprobar si el usuario ya está registrado
+  function checkRegistration() {
+    const savedUser = localStorage.getItem('galaxite-user');
+    if (savedUser) {
+      // Si está registrado, ocultar el overlay
+      document.getElementById('registro-overlay').style.display = 'none';
+    } else {
+      // Si no está registrado, mostrar el overlay
+      document.getElementById('registro-overlay').style.display = 'flex';
+    }
+  }
+
+  // Mostrar sección
+  function showSection(sectionId) {
+    // Solo permitir cambiar de sección si el usuario ya está registrado
+    const savedUser = localStorage.getItem('galaxite-user');
+    if (!savedUser) {
+      return; // No hacer nada si no está registrado
+    }
+    
+    const sections = document.getElementsByClassName('section');
+    for (let i = 0; i < sections.length; i++) {
+      sections[i].classList.remove('active');
+    }
+    document.getElementById(sectionId).classList.add('active');
+    
+    // En móvil, cerrar el menú después de seleccionar
+    if (window.innerWidth <= 768) {
+      document.getElementById('menu').classList.remove('show');
+    }
+  }
+
+  // Toggle menú en móvil
+  function toggleMenu() {
+    // Solo permitir abrir el menú si el usuario ya está registrado
+    const savedUser = localStorage.getItem('galaxite-user');
+    if (!savedUser) {
+      return; // No hacer nada si no está registrado
+    }
+    
+    const menu = document.getElementById('menu');
+    menu.classList.toggle('show');
+  }
+
+  // Registrar usuario desde el overlay
+  function registrarUsuarioOverlay(event) {
+    event.preventDefault();
+    const nick = document.getElementById('nick-overlay').value;
+    const password = document.getElementById('password-overlay').value;
+    const confirmPassword = document.getElementById('confirm-password-overlay').value;
+    const age = document.getElementById('age-overlay').value;
+    
+    if (password !== confirmPassword) {
+      document.getElementById('registro-mensaje-overlay').textContent = 'Las contraseñas no coinciden';
+      document.getElementById('registro-mensaje-overlay').style.color = '#ff6b6b';
+      return;
+    }
+    
+    // Guardar en localStorage
+    localStorage.setItem('galaxite-user', JSON.stringify({
+      nick: nick,
+      password: password,
+      age: age
+    }));
+    
+    document.getElementById('registro-mensaje-overlay').textContent = '¡Registro exitoso!';
+    document.getElementById('registro-mensaje-overlay').style.color = '#4caf50';
+    
+    // Ocultar overlay después de 1 segundo
+    setTimeout(() => {
+      document.getElementById('registro-overlay').style.display = 'none';
+      
+      // Actualizar el mensaje de bienvenida en la sección de inicio
+      document.getElementById('inicio').innerHTML += `
+        <p>¡Bienvenido, <strong>${nick}</strong>!</p>
+      `;
+    }, 1000);
+  }
+
+  // Registrar usuario desde la sección normal
+  function registrarUsuario(event) {
+    event.preventDefault();
+    const nick = document.getElementById('nick').value;
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    const age = document.getElementById('age').value;
+    
+    if (password !== confirmPassword) {
+      document.getElementById('registro-mensaje').textContent = 'Las contraseñas no coinciden';
+      document.getElementById('registro-mensaje').style.color = '#ff6b6b';
+      return;
+    }
+    
+    // Guardar en localStorage
+    localStorage.setItem('galaxite-user', JSON.stringify({
+      nick: nick,
+      password: password,
+      age: age
+    }));
+    
+    document.getElementById('registro-mensaje').textContent = '¡Registro exitoso!';
+    document.getElementById('registro-mensaje').style.color = '#4caf50';
+    
+    // Resetear formulario
+    event.target.reset();
+    
+    // Mostrar inicio después de 2 segundos
+    setTimeout(() => {
+      showSection('inicio');
+      
+      // Actualizar el mensaje de bienvenida en la sección de inicio
+      document.getElementById('inicio').innerHTML += `
+        <p>¡Bienvenido, <strong>${nick}</strong>!</p>
+      `;
+    }, 2000);
+  }
+
+  // Calificar servidor
+  function calificarServidor(event) {
+    event.preventDefault();
+    const rating = document.getElementById('rating').value;
+    const comment = document.getElementById('comment').value;
+    
+    // Obtener usuario o usar "Anónimo"
+    let user = "Anónimo";
+    const savedUser = localStorage.getItem('galaxite-user');
+    if (savedUser) {
+      user = JSON.parse(savedUser).nick;
+    }
+    
+    // Guardar calificación
+    let ratings = JSON.parse(localStorage.getItem('galaxite-ratings')) || [];
+    ratings.unshift({
+      user: user,
+      rating: rating,
+      comment: comment,
+      date: new Date().toLocaleDateString()
+    });
+    
+    localStorage.setItem('galaxite-ratings', JSON.stringify(ratings));
+    
+    document.getElementById('calificacion-mensaje').textContent = '¡Gracias por tu calificación!';
+    document.getElementById('calificacion-mensaje').style.color = '#4caf50';
+    
+    // Resetear formulario
+    event.target.reset();
+    
+    // Actualizar lista de opiniones
+    mostrarOpiniones();
+  }
+
+  // Mostrar opiniones
+  function mostrarOpiniones() {
+    const container = document.getElementById('opiniones-container');
+    container.innerHTML = '';
+    
+    const ratings = JSON.parse(localStorage.getItem('galaxite-ratings')) || [];
+    
+    if (ratings.length === 0) {
+      container.innerHTML = '<p>No hay opiniones todavía. ¡Sé el primero en calificar!</p>';
+      return;
+    }
+    
+    // Mostrar hasta 5 opiniones
+    const opinionsToShow = ratings.slice(0, 5);
+    
+    opinionsToShow.forEach(rating => {
+      const opinionElement = document.createElement('div');
+      opinionElement.className = 'opinion';
+      opinionElement.innerHTML = `
+        <p><strong>${rating.user}</strong> - ${rating.date}</p>
+        <p>Calificación: ${rating.rating}/10</p>
+        <p>${rating.comment}</p>
+      `;
+      container.appendChild(opinionElement);
+    });
+  }
+
+  // Inicializar página
+  window.onload = function() {
+    // Comprobar si hay usuario registrado
+    checkRegistration();
+    
+    // Mostrar opiniones
+    mostrarOpiniones();
+  };
+</script>
+
+</body>
+  </html>
